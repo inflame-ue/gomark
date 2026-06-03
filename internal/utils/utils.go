@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -18,13 +19,13 @@ func WriteError(w http.ResponseWriter, err error, status int) error {
 	
 	data, err := json.Marshal(errResp)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to marhal the error: %v", err)
 	}
 
 	w.WriteHeader(status)
 	_, err = w.Write(data)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to write the data: %v", err)
 	}
 
 	return nil
