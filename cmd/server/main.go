@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/inflame-ue/gomark/internal/grammar"
 	"github.com/joho/godotenv"
 )
 
@@ -16,6 +17,7 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
+	mux.HandleFunc("/grammar", grammar.HandleMarkdownGrammarCheck)
 
 	port := os.Getenv("PORT")
 	serv := http.Server{
