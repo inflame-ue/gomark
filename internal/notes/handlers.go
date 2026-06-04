@@ -1,7 +1,11 @@
 package notes
 
-import "net/http"
+import (
+	"net/http"
 
-func HandlePostNotes(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("This endpoint will sooner or later handle uploading notes via JSON."))
+	"github.com/inflame-ue/gomark/internal/db"
+)
+
+func HandlePostNotes(w http.ResponseWriter, r *http.Request, db *db.DB) {
+	
 }
