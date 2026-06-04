@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/inflame-ue/gomark/internal/grammar"
+	"github.com/inflame-ue/gomark/internal/notes"
 	"github.com/joho/godotenv"
 )
 
@@ -17,7 +18,8 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/grammar", grammar.HandleGrammarCheck)
+	mux.HandleFunc("POST /grammar", grammar.HandleGrammarCheck)
+	mux.HandleFunc("POST /notes", notes.HandlePostNotes)
 
 	port := os.Getenv("SERVER_PORT")
 	serv := http.Server{
