@@ -19,7 +19,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/grammar", grammar.HandleGrammarCheck)
 
-	port := os.Getenv("PORT")
+	port := os.Getenv("SERVER_PORT")
 	serv := http.Server{
 		Addr:         ":" + port,
 		Handler:      mux,
