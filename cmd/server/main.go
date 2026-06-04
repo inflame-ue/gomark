@@ -12,9 +12,7 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func databaseMiddleWare(
-	db *db.DB,
-	handler func(w http.ResponseWriter, r *http.Request, db *db.DB)
+func databaseMiddleWare(db *db.DB, handler func(w http.ResponseWriter, r *http.Request, db *db.DB),
 ) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		handler(w, r, db)
@@ -34,7 +32,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /grammar", grammar.HandleGrammarCheck)
-	mux.HandleFunc("POST /notes", databaseMiddleWare(db, notes.HandlePostNotes))
+	mux.HandleFunc("POST /notes", databaseMiddleWare(db, notes.HandlePostNote))
 
 	port := os.Getenv("SERVER_PORT")
 	serv := http.Server{
