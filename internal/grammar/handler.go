@@ -49,7 +49,17 @@ func HandleGrammarCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := utils.WriteJSON(w, markdown)
+	grammarIssues, err := checkGrammar(&markdown)
+	if err != nil {
+		log.Print(err.Error())
+		err := utils.WriteError(w, err, http.StatusInternalServerError)
+		if err != nil {
+			log.Print(err)
+		}
+		return
+	}
+
+	err = utils.WriteJSON(w, grammarIssues)
 	if err != nil {
 		log.Print(err)
 	}

@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
-	"strings"
 
 	"github.com/inflame-ue/gomark/internal/markdown"
-	"github.com/joho/godotenv"
 )
 
 type languageToolResponse struct {
@@ -17,8 +16,8 @@ type languageToolResponse struct {
 		Replacements []struct {
 			Value string `json:"value"`
 		} `json:"replacements"`
-		Offset  int `json:"offset"`
-		Length  int `json:"length"`
+		Offset   int    `json:"offset"`
+		Length   int    `json:"length"`
 		Sentence string `json:"sentence"`
 		Type     struct {
 			TypeName string `json:"typeName"`
@@ -27,13 +26,11 @@ type languageToolResponse struct {
 }
 
 func checkGrammar(content *markdown.Markdown) (*languageToolResponse, error) {
-	err := godotenv.Load() 
-	if err != nil {
-		return nil, fmt.Errorf("failed to laod the .env file: %v", err)
-	}
-
 	languageToolHost, languageToolAddr := os.Getenv("LANGUAGE_TOOL_HOST"), os.Getenv("LANGUAGE_TOOL_PORT")
-	resp, err := http.Post(languageToolHost + ":" + languageToolAddr, "application/text", strings.NewReader(content.Content))
+	parsedURL := fmt.Sprintf("http://%s:%s/v2/check", languageToolHost, languageToolAddr)
+	data := url.Values{"text": {content.Content}, "language": {"en-US"}}
+
+	resp, err := http.PostForm(parsedURL, data)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get a response from language tool API: %v", err)
 	}
