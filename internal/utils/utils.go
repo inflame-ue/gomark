@@ -30,7 +30,7 @@ func RequireContentType(r *http.Request, contentType string) error {
 }
 
 func WriteErrorAndLog(w http.ResponseWriter, err error, status int) error {
-	log.Print(err.Error())
+	log.Print(err)
 
 	errResp := errorResponse{
 		Status:  status,

@@ -12,20 +12,24 @@ import (
 func HandleGrammarCheck(w http.ResponseWriter, r *http.Request) {
 	if err := utils.RequireMethod(r, http.MethodPost); err != nil {
 		utils.WriteErrorAndLog(w, err, http.StatusMethodNotAllowed)
+		return
 	}
 
 	if err := utils.RequireContentType(r, "application/json"); err != nil {
 		utils.WriteErrorAndLog(w, err, http.StatusBadRequest)
+		return
 	}
 
 	var markdown markdown.Markdown
 	if err := json.NewDecoder(r.Body).Decode(&markdown); err != nil {
 		utils.WriteErrorAndLog(w, err, http.StatusBadRequest)
+		return
 	}
 
 	grammarIssues, err := checkGrammar(&markdown)
 	if err != nil {
 		utils.WriteErrorAndLog(w, err, http.StatusInternalServerError)
+		return
 	}
 
 	err = utils.WriteJSON(w, grammarIssues)
