@@ -33,6 +33,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("POST /grammar", grammar.HandleGrammarCheck)
 	mux.HandleFunc("POST /notes", databaseMiddleWare(db, notes.HandlePostNote))
+	mux.HandleFunc("GET /notes", databaseMiddleWare(db, notes.HandleGetNotes))
 
 	port := os.Getenv("SERVER_PORT")
 	serv := http.Server{
