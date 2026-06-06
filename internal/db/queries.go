@@ -23,6 +23,18 @@ func (db *DB) CreateNote(title, content string) (int64, error) {
 	return id, err
 }
 
+func (db *DB) CreateNoteFromUpload(title, content, filepath string) (int64, error) {
+	result, err := db.Connection.Exec("INSERT INTO notes (title, content, file_path) VALUES (?, ?, ?)", title, content, filepath)
+	if err != nil {
+		return 0, err
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	return id, err
+}
+
 func (db *DB) ListNotes() (*NotesResponse, error) {
 	var notes NotesResponse
 	notes.Notes = []NoteResponse{} // initiliaze to get [], instead of null for empty
