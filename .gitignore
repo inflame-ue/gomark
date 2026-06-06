@@ -23,3 +23,9 @@ go.work.sum
 
 # server binary
 gomark
+
+# file uploads
+uploads/
+
+# database file
+db/notes.db
