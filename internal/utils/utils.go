@@ -37,15 +37,16 @@ func WriteErrorAndLog(w http.ResponseWriter, err error, status int) error {
 		Message: err.Error(),
 	}
 
-	data, err := json.Marshal(errResp)
-	if err != nil {
-		return fmt.Errorf("failed to marhal the error: %v", err)
+	data, marshalErr := json.Marshal(errResp)
+	if marshalErr != nil {
+		return fmt.Errorf("failed to marhal the error: %v", marshalErr)
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	_, err = w.Write(data)
-	if err != nil {
-		return fmt.Errorf("failed to write the data: %v", err)
+	_, writeErr := w.Write(data)
+	if writeErr != nil {
+		return fmt.Errorf("failed to write the data: %v", writeErr)
 	}
 
 	return nil
@@ -57,6 +58,7 @@ func WriteJSON(w http.ResponseWriter, payload any) error {
 		return err
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	_, err = w.Write(data)
 	if err != nil {
 		return err
