@@ -10,7 +10,7 @@ import (
 	"github.com/inflame-ue/gomark/internal/utils"
 )
 
-type Note struct {
+type CreateNoteRequest struct {
 	Title   string `json:"title"`
 	Content string `json:"text"`
 }
@@ -26,7 +26,7 @@ func HandlePostNote(w http.ResponseWriter, r *http.Request, db *db.DB) {
 		return
 	}
 
-	var note Note
+	var note CreateNoteRequest
 	if err := json.NewDecoder(r.Body).Decode(&note); err != nil {
 		utils.WriteErrorAndLog(w, err, http.StatusBadRequest)
 		return
@@ -44,6 +44,24 @@ func HandlePostNote(w http.ResponseWriter, r *http.Request, db *db.DB) {
 		Message: fmt.Sprintf("Note with title '%v' created successfully", note.Title),
 	}
 	err = utils.WriteJSON(w, successMsg)
+	if err != nil {
+		log.Print(err)
+	}
+}
+
+func HandleGetNotes(w http.ResponseWriter, r *http.Request, db *db.DB) {
+	if err := utils.RequireMethod(r, http.MethodGet); err != nil {
+		utils.WriteErrorAndLog(w, err, http.StatusMethodNotAllowed)
+		return
+	}
+
+	notes, err := db.ListNotes()
+	if err != nil {
+		utils.WriteErrorAndLog(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	err = utils.WriteJSON(w, notes)
 	if err != nil {
 		log.Print(err)
 	}
