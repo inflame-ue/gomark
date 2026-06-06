@@ -1,15 +1,21 @@
-package grammar
+package notes
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/inflame-ue/gomark/internal/markdown"
+	"github.com/inflame-ue/gomark/internal/db"
 	"github.com/inflame-ue/gomark/internal/utils"
 )
 
-func HandleGrammarCheck(w http.ResponseWriter, r *http.Request) {
+type Note struct {
+	Title   string `json:"title"`
+	Content string `json:"text"`
+}
+
+func HandlePostNote(w http.ResponseWriter, r *http.Request, db *db.DB) {
 	if err := utils.RequireMethod(r, http.MethodPost); err != nil {
 		utils.WriteErrorAndLog(w, err, http.StatusMethodNotAllowed)
 		return
@@ -20,19 +26,24 @@ func HandleGrammarCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var markdown markdown.Markdown
-	if err := json.NewDecoder(r.Body).Decode(&markdown); err != nil {
+	var note Note
+	if err := json.NewDecoder(r.Body).Decode(&note); err != nil {
 		utils.WriteErrorAndLog(w, err, http.StatusBadRequest)
 		return
 	}
 
-	grammarIssues, err := checkGrammar(&markdown)
+	_, err := db.CreateNote(note.Title, note.Content)
 	if err != nil {
 		utils.WriteErrorAndLog(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	err = utils.WriteJSON(w, grammarIssues)
+	successMsg := struct {
+		Message string `json:"message"`
+	}{
+		Message: fmt.Sprintf("Note with title '%v' created successfully", note.Title),
+	}
+	err = utils.WriteJSON(w, successMsg)
 	if err != nil {
 		log.Print(err)
 	}

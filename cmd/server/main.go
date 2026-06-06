@@ -6,9 +6,18 @@ import (
 	"os"
 	"time"
 
+	"github.com/inflame-ue/gomark/internal/db"
 	"github.com/inflame-ue/gomark/internal/grammar"
+	"github.com/inflame-ue/gomark/internal/notes"
 	"github.com/joho/godotenv"
 )
+
+func databaseMiddleWare(db *db.DB, handler func(w http.ResponseWriter, r *http.Request, db *db.DB),
+) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		handler(w, r, db)
+	}
+}
 
 func main() {
 	err := godotenv.Load()
@@ -16,8 +25,14 @@ func main() {
 		log.Fatal("error loading the .env file")
 	}
 
+	db, err := db.NewDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	mux := http.NewServeMux()
-	mux.HandleFunc("/grammar", grammar.HandleGrammarCheck)
+	mux.HandleFunc("POST /grammar", grammar.HandleGrammarCheck)
+	mux.HandleFunc("POST /notes", databaseMiddleWare(db, notes.HandlePostNote))
 
 	port := os.Getenv("SERVER_PORT")
 	serv := http.Server{
