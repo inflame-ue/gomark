@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/inflame-ue/gomark/internal/markdown"
+	"github.com/inflame-ue/gomark/internal/mark"
 	"github.com/inflame-ue/gomark/internal/request"
 	"github.com/inflame-ue/gomark/internal/respond"
 )
@@ -21,7 +21,7 @@ func HandleGrammarCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var markdown markdown.Markdown
+	var markdown mark.Markdown
 	if err := json.NewDecoder(r.Body).Decode(&markdown); err != nil {
 		respond.WriteErrorAndLog(w, err, http.StatusBadRequest)
 		return

@@ -49,3 +49,13 @@ func WriteJSON(w http.ResponseWriter, payload any) error {
 
 	return nil
 }
+
+func WriteHTML(w http.ResponseWriter, html []byte) error {
+	w.Header().Set("Content-Type", "text/html")
+	_, err := w.Write(html)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
