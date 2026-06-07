@@ -8,6 +8,7 @@ import (
 
 	"github.com/inflame-ue/gomark/internal/db"
 	"github.com/inflame-ue/gomark/internal/grammar"
+	"github.com/inflame-ue/gomark/internal/mark"
 	"github.com/inflame-ue/gomark/internal/notes"
 	"github.com/joho/godotenv"
 )
@@ -36,6 +37,7 @@ func main() {
 	mux.HandleFunc("POST /notes/upload", databaseMiddleWare(db, notes.HandleUploadNote))
 	mux.HandleFunc("GET /notes", databaseMiddleWare(db, notes.HandleGetNotes))
 	mux.HandleFunc("GET /notes/{id}", databaseMiddleWare(db, notes.HandleGetNote))
+	mux.HandleFunc("GET /notes/{id}/html", databaseMiddleWare(db, mark.HandleRenderNoteHTML))
 
 	port := os.Getenv("SERVER_PORT")
 	serv := http.Server{

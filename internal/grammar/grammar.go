@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/inflame-ue/gomark/internal/markdown"
+	"github.com/inflame-ue/gomark/internal/mark"
 )
 
 type languageToolResponse struct {
@@ -25,7 +25,7 @@ type languageToolResponse struct {
 	} `json:"matches"`
 }
 
-func checkGrammar(content *markdown.Markdown) (*languageToolResponse, error) {
+func checkGrammar(content *mark.Markdown) (*languageToolResponse, error) {
 	languageToolHost, languageToolAddr := os.Getenv("LANGUAGE_TOOL_HOST"), os.Getenv("LANGUAGE_TOOL_PORT")
 	parsedURL := fmt.Sprintf("http://%s:%s/v2/check", languageToolHost, languageToolAddr)
 	data := url.Values{"text": {content.Content}, "language": {"en-US"}}
