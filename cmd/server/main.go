@@ -35,6 +35,7 @@ func main() {
 	mux.HandleFunc("POST /notes", databaseMiddleWare(db, notes.HandlePostNote))
 	mux.HandleFunc("POST /notes/upload", databaseMiddleWare(db, notes.HandleUploadNote))
 	mux.HandleFunc("GET /notes", databaseMiddleWare(db, notes.HandleGetNotes))
+	mux.HandleFunc("GET /notes/{id}", databaseMiddleWare(db, notes.HandleGetNote))
 
 	port := os.Getenv("SERVER_PORT")
 	serv := http.Server{

@@ -1,14 +1,28 @@
 package db
 
-type NoteResponse struct {
+import (
+	"database/sql"
+	"fmt"
+)
+
+type MetaNoteResponse struct {
 	ID        int64  `json:"id"`
 	Title     string `json:"title"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
 
+type DetailedNoteResponse struct {
+	ID        int64          `json:"id"`
+	Title     string         `json:"title"`
+	Filepath  string `json:"filepath"`
+	Content   string         `json:"text"`
+	CreatedAt string         `json:"created_at"`
+	UpdatedAt string         `json:"updated_at"`
+}
+
 type NotesResponse struct {
-	Notes []NoteResponse `json:"notes"`
+	Notes []MetaNoteResponse `json:"notes"`
 }
 
 func (db *DB) CreateNote(title, content string) (int64, error) {
@@ -37,7 +51,7 @@ func (db *DB) CreateNoteFromUpload(title, content, filepath string) (int64, erro
 
 func (db *DB) ListNotes() (*NotesResponse, error) {
 	var notes NotesResponse
-	notes.Notes = []NoteResponse{} // initiliaze to get [], instead of null for empty
+	notes.Notes = []MetaNoteResponse{} // initiliaze to get [], instead of null for empty
 
 	rows, err := db.Connection.Query("SELECT id, title, created_at, updated_at FROM notes")
 	if err != nil {
@@ -46,7 +60,7 @@ func (db *DB) ListNotes() (*NotesResponse, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var note NoteResponse
+		var note MetaNoteResponse
 		if err := rows.Scan(&note.ID, &note.Title, &note.CreatedAt, &note.UpdatedAt); err != nil {
 			return nil, err
 		}
@@ -57,4 +71,18 @@ func (db *DB) ListNotes() (*NotesResponse, error) {
 	}
 
 	return &notes, nil
+}
+
+func (db *DB) GetNoteById(id int) (*DetailedNoteResponse, error) {
+	var note DetailedNoteResponse
+
+	row := db.Connection.QueryRow("SELECT id, title, content, COALESCE(file_path, ''), created_at, updated_at FROM notes WHERE id = ?", id)
+	if err := row.Scan(&note.ID, &note.Title, &note.Content, &note.Filepath, &note.CreatedAt, &note.UpdatedAt); err != nil {
+		if err == sql.ErrNoRows {
+			return &note, fmt.Errorf("no note with id: %d", id)
+		}
+		return &note, fmt.Errorf("scan of the row did not succeed: %v", err)
+	}
+
+	return &note, nil
 }

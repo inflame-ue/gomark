@@ -2,10 +2,12 @@ package notes
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/inflame-ue/gomark/internal/db"
 	"github.com/inflame-ue/gomark/internal/utils"
@@ -108,11 +110,35 @@ func HandleGetNotes(w http.ResponseWriter, r *http.Request, db *db.DB) {
 
 	notes, err := db.ListNotes()
 	if err != nil {
-		utils.WriteErrorAndLog(w, err, http.StatusInternalServerError)
+		utils.WriteErrorAndLog(w, err, http.StatusBadRequest)
 		return
 	}
 
 	err = utils.WriteJSON(w, notes)
+	if err != nil {
+		log.Print(err)
+	}
+}
+
+func HandleGetNote(w http.ResponseWriter, r *http.Request, db *db.DB) {
+	if err := utils.RequireMethod(r, http.MethodGet); err != nil {
+		utils.WriteErrorAndLog(w, err, http.StatusMethodNotAllowed)
+		return
+	}
+
+	noteID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		utils.WriteErrorAndLog(w, errors.New("the id provided must be a valid integer"), http.StatusBadRequest)
+		return
+	}
+
+	note, err := db.GetNoteById(noteID)
+	if err != nil {
+		utils.WriteErrorAndLog(w, err, http.StatusBadRequest)
+		return
+	}
+
+	err = utils.WriteJSON(w, note)
 	if err != nil {
 		log.Print(err)
 	}
